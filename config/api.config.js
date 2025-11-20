@@ -31,4 +31,8 @@ module.exports = {
   // - stale-while-revalidate: allow serving stale content while revalidating on the edge
   // https://vercel.com/docs/concepts/edge-network/caching
   cacheControlHeader: 'max-age=0, s-maxage=60, stale-while-revalidate',
+
+  //SharePoint Proxy URL
+  sharepoint_source_url: "tymtymtym22outlook-my.sharepoint.com",
+  sharepoint_proxy_url: "sharepoint.022928.xyz",
 }
