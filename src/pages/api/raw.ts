@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import axios, { AxiosResponseHeaders } from 'axios'
 import Cors from 'cors'
 
-import { driveApi, cacheControlHeader } from '../../../config/api.config'
+import { driveApi, cacheControlHeader,sharepoint_source_url, sharepoint_proxy_url } from '../../../config/api.config'
 import { encodePath, getAccessToken, checkAuthRoute } from '.'
 
 // CORS middleware for raw links: https://nextjs.org/docs/api-routes/api-middlewares
@@ -80,7 +80,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.writeHead(200, headers as AxiosResponseHeaders)
         stream.pipe(res)
       } else {
-        res.redirect(data['@microsoft.graph.downloadUrl'])
+        if(sharepoint_proxy_url) {
+          res.redirect(data['@microsoft.graph.downloadUrl'].replace(sharepoint_source_url,sharepoint_proxy_url))
+        }
+        else {
+          res.redirect(data['@microsoft.graph.downloadUrl'])
+        }
       }
     } else {
       res.status(404).json({ error: 'No download url found.' })
