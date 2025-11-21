@@ -1,6 +1,6 @@
 import type { OdFileObject } from '../../types'
 
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
@@ -54,20 +54,49 @@ const VideoPlayer: FC<{
     }
   }, [videoUrl, isFlv, mpegts, subtitle])
 
+  // ---------------------------------------------------------
+  // 修复逻辑 1: 数据防御 (useMemo)
+  // ---------------------------------------------------------
+  const plyrOptions = useMemo(() => {
+    // 检查宽高是否存在且大于0
+    const hasValidDimensions = width && height && width > 0 && height > 0
+    
+    return {
+      // 如果有有效尺寸，使用 "宽:高"；否则默认 "16:9"，避免 "0:0" 导致崩溃
+      ratio: hasValidDimensions ? `${width}:${height}` : '16:9',
+      fullscreen: { iosNative: true },
+    } as Plyr.Options
+  }, [width, height])
+
   const plyrSource = {
     type: 'video',
     title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
   }
-  const plyrOptions: Plyr.Options = {
-    ratio: `${width ?? 16}:${height ?? 9}`,
-    fullscreen: { iosNative: true },
-  }
+
   if (!isFlv) {
     plyrSource['sources'] = [{ src: videoUrl }]
   }
-  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
+
+  // ---------------------------------------------------------
+  // 修复逻辑 2: CSS 兜底
+  // ---------------------------------------------------------
+  return (
+    <div className="plyr-container" style={{ width: '100%', maxHeight: '80vh' }}>
+      <Plyr 
+        id="plyr" 
+        source={plyrSource as Plyr.SourceInfo} 
+        options={plyrOptions} 
+      />
+      <style jsx global>{`
+        .plyr {
+          height: 100%;
+          width: 100%;
+        }
+      `}</style>
+    </div>
+  )
 }
 
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
