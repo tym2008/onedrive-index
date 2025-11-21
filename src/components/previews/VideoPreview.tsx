@@ -54,15 +54,8 @@ const VideoPlayer: FC<{
     }
   }, [videoUrl, isFlv, mpegts, subtitle])
 
-  const plyrSource = {
-    type: 'video',
-    title: videoName,
-    poster: thumbnail,
-    tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
-  }
   // ---------------------------------------------------------
-  // 逻辑迁移 1: 数据防御
-  // 使用 useMemo 避免每次渲染都重新计算，并增加有效性检查
+  // 修复逻辑 1: 数据防御 (useMemo)
   // ---------------------------------------------------------
   const plyrOptions = useMemo(() => {
     // 检查宽高是否存在且大于0
@@ -72,7 +65,6 @@ const VideoPlayer: FC<{
       // 如果有有效尺寸，使用 "宽:高"；否则默认 "16:9"，避免 "0:0" 导致崩溃
       ratio: hasValidDimensions ? `${width}:${height}` : '16:9',
       fullscreen: { iosNative: true },
-      // 可以在这里添加 autoSize: false 等配置，如果 Plyr 支持的话
     } as Plyr.Options
   }, [width, height])
 
@@ -88,8 +80,7 @@ const VideoPlayer: FC<{
   }
 
   // ---------------------------------------------------------
-  // 逻辑迁移 2: CSS 兜底 (模拟 Artplayer 的 Box h="60vh")
-  // 给外层 div 一个限制，确保在无比例数据时播放器也有高度
+  // 修复逻辑 2: CSS 兜底
   // ---------------------------------------------------------
   return (
     <div className="plyr-container" style={{ width: '100%', maxHeight: '80vh' }}>
@@ -99,8 +90,6 @@ const VideoPlayer: FC<{
         options={plyrOptions} 
       />
       <style jsx global>{`
-        /* 可选：强制覆盖 Plyr 的默认样式，使其适应容器高度，模仿 Artplayer 效果 */
-        /* 如果你不加这一段，Plyr 会严格按照 16:9 撑开高度，也是安全的 */
         .plyr {
           height: 100%;
           width: 100%;
@@ -108,11 +97,6 @@ const VideoPlayer: FC<{
       `}</style>
     </div>
   )
-}
-  if (!isFlv) {
-    plyrSource['sources'] = [{ src: videoUrl }]
-  }
-  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
 }
 
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
