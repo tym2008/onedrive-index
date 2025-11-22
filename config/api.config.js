@@ -33,6 +33,6 @@ module.exports = {
   cacheControlHeader: 'max-age=0, s-maxage=60, stale-while-revalidate',
 
   //SharePoint Proxy URL
-  sharepoint_source_url: "tymtymtym22outlook-my.sharepoint.com",
+  sharepoint_source_url: "tym2008-my.sharepoint.com",
   sharepoint_proxy_url: "sharepoint.022928.xyz",
 }
