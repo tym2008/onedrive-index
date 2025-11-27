@@ -80,6 +80,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.writeHead(200, headers as AxiosResponseHeaders)
         stream.pipe(res)
       } else {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         if(sharepoint_proxy_url) {
           res.redirect(data['@microsoft.graph.downloadUrl'].replace(sharepoint_source_url,sharepoint_proxy_url))
         }
